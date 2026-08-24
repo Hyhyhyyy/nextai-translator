@@ -338,11 +338,10 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                 }
                                 const { finish_reason: finishReason, delta } = choices[0]
 
-                // Some providers (e.g. OpenRouter forwarding Gemini) emit the
-                // final text segment together with finish_reason in the same
-                // chunk, instead of sending an empty delta on the last chunk
-                // like the OpenAI API does. Emit the content first so the last
-                // segment is not dropped when finish_reason is present.
+                // OpenAI ends a stream with an empty delta plus finish_reason,
+                // but some proxies (e.g. OpenRouter -> Gemini) send the final
+                // text segment together with finish_reason in the same chunk.
+                // Emit the content first so the last segment is never dropped.
                 if (isChatAPI) {
                     const { content = '', role } = delta ?? {}
                     if (content) {
