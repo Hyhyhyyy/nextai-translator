@@ -336,7 +336,7 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                 if (!choices || choices.length === 0) {
                     return
                 }
-                                const { finish_reason: finishReason, delta } = choices[0]
+                const { finish_reason: finishReason, delta } = choices[0]
 
                 // OpenAI ends a stream with an empty delta plus finish_reason,
                 // but some proxies (e.g. OpenRouter -> Gemini) send the final
