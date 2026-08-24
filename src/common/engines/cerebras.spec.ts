@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Cerebras } from './cerebras'
 import { IMessageRequest } from './interfaces'
-import { fetchSSE, getSettings } from '../utils'
+import { fetchSSE } from '../utils'
 
 vi.mock('../utils', () => {
     return {
