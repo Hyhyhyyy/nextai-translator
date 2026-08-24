@@ -336,25 +336,29 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                 if (!choices || choices.length === 0) {
                     return
                 }
-                const { finish_reason: finishReason } = choices[0]
+                                const { finish_reason: finishReason, delta } = choices[0]
+
+                // Some providers (e.g. OpenRouter forwarding Gemini) emit the
+                // final text segment together with finish_reason in the same
+                // chunk, instead of sending an empty delta on the last chunk
+                // like the OpenAI API does. Emit the content first so the last
+                // segment is not dropped when finish_reason is present.
+                if (isChatAPI) {
+                    const { content = '', role } = delta ?? {}
+                    if (content) {
+                        await req.onMessage({ content, role })
+                    }
+                } else {
+                    const text = choices[0].text
+                    if (text) {
+                        await req.onMessage({ content: text, role: '' })
+                    }
+                }
+
                 if (finishReason) {
                     req.onFinished(finishReason)
                     finished = true
                     return
-                }
-
-                let targetTxt = ''
-                if (!isChatAPI) {
-                    // It's used for Azure OpenAI Service's legacy parameters.
-                    targetTxt = choices[0].text
-
-                    await req.onMessage({ content: targetTxt, role: '' })
-                } else {
-                    const { content = '', role } = choices[0].delta
-
-                    targetTxt = content
-
-                    await req.onMessage({ content: targetTxt, role })
                 }
             },
             onError: (err) => {
