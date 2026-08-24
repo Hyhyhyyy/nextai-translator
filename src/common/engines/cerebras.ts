@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { getSettings } from '../utils'
 import { AbstractOpenAI } from './abstract-openai'
 
